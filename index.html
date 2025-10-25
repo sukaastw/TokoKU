@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Admin Panel</title>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Tambahan untuk update title berdasarkan URL -->
+    <script>
+      // Fungsi untuk update title berdasarkan path
+      const updateTitle = (path) => {
+        let title = "TokoKu";
+
+        // Halaman utama
+        if (path === "/dashboard") {
+          title = "Beranda";
+        } else if (path.includes("/cart")) {
+          title = "Keranjang";
+        } else if (path.includes("/checkout")) {
+          title = "Checkout";
+
+        // Halaman admin
+        } else if (path.includes("/admin/dashboard")) {
+          title = "Dashboard - My Admin Panel";
+        } else if (path.includes("/admin/about")) {
+          title = "About - My Admin Panel";
+        } else if (path.includes("/admin/checkout")) {
+          title = "Checkout Admin - My Admin Panel";
+        }
+
+        document.title = title;
+      };
+
+      // Jalankan saat pertama kali
+      updateTitle(window.location.pathname);
+
+      // Intersep pushState dan replaceState agar bisa deteksi navigasi React Router
+      const wrapHistoryMethod = (type) => {
+        const original = history[type];
+        history[type] = function () {
+          const result = original.apply(this, arguments);
+          updateTitle(arguments[2]); // arguments[2] = pathname
+          return result;
+        };
+      };
+
+      wrapHistoryMethod("pushState");
+      wrapHistoryMethod("replaceState");
+
+      // Juga dengarkan popstate (navigasi via tombol back/forward)
+      window.addEventListener("popstate", () => {
+        updateTitle(window.location.pathname);
+      });
+    </script>
+  </body>
+</html>
